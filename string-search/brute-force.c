@@ -1,6 +1,10 @@
 #include <string.h>
 
 /*
+ * frama-c -wp -wp-rte -wp-print brute-force.c
+ */
+
+/*
  * Search for needile in haystack, using a brute force algorithm.
  *
  * Expected complexity is O(n*h), where n in the length of the needle and
@@ -18,7 +22,7 @@ brute_force (char *needle, int n, char *haystack, int h)
 
   /* Searching */
   /*@
-   loop assigns i,j;
+   loop assigns i, j;
    loop invariant 0 <= j <= (h-n) + 1;
    */
   for (j = 0; j <= h - n; ++j) {
@@ -40,6 +44,7 @@ brute_force (char *needle, int n, char *haystack, int h)
  * - x <= 2147483647
  * - i <= 2147483646
  * - j <= 2147483646
+ * - 0 <= n
  * - n <= (2147483648 + h)
  * - (-1) <= j (outer loop invariant)
  * - n <= (1 + h) (outer loop invariant)
@@ -48,7 +53,6 @@ brute_force (char *needle, int n, char *haystack, int h)
  * - valid_rd(Malloc_0, a, 1)
  * - valid_rd(Malloc_0, shift_sint8(haystack_0, to_sint32(x)), 1)
  * - h <= (2147483647 + n)
- * - 0 <= n
  */
 /*
  * Current invalid properties:
