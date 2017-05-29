@@ -7,8 +7,8 @@
  * h is the length of the haystack.
  */
 /*@
- requires \valid(needle + (0 .. n-1)) && n < INT_MAX;
- requires \valid(haystack + (0 .. h-1)) && h < INT_MAX;
+ requires \valid(needle + (0 .. n-1)) && 0 <= n < INT_MAX;
+ requires \valid(haystack + (0 .. h-1)) && 0 <= h < INT_MAX;
  requires n <= h;
  */
 int
@@ -37,19 +37,19 @@ brute_force (char *needle, int n, char *haystack, int h)
 /*
  * Current valid properties:
  * - loop assignments (2)
- * - x <= 2147483647, line 22
- * - i <= 2147483646, line 22
- * - j <= 2147483646, line 18
- * - n <= (2147483648 + h), line 18
+ * - x <= 2147483647
+ * - i <= 2147483646
+ * - j <= 2147483646
+ * - n <= (2147483648 + h)
  * - (-1) <= j (outer loop invariant)
  * - n <= (1 + h) (outer loop invariant)
  * - (-1) <= i
- * - (-2147483648) <= x, line 22
- * - valid_rd(Malloc_0, a, 1), line 22
- * - valid_rd(Malloc_0, shift_sint8(haystack_0, to_sint32(x)), 1), line 22
+ * - (-2147483648) <= x
+ * - valid_rd(Malloc_0, a, 1)
+ * - valid_rd(Malloc_0, shift_sint8(haystack_0, to_sint32(x)), 1)
+ * - h <= (2147483647 + n)
+ * - 0 <= n
  */
 /*
  * Current invalid properties:
- * - h <= (2147483647 + n), line 18
- * - 0 <= n
  */
