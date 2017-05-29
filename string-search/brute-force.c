@@ -12,7 +12,13 @@ brute_force (char *needle, int n, char *haystack, int h)
   int i, j;
 
   /* Searching */
+  /*@
+   loop assigns i,j;
+   */
   for (j = 0; j <= h - n; ++j) {
+    /*@
+     loop assigns i;
+    */
     for (i = 0; i < n && needle[i] == haystack[i + j]; ++i);
     if (i >= n) {
       return j;
