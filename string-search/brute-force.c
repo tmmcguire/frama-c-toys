@@ -26,3 +26,19 @@ brute_force (char *needle, int n, char *haystack, int h)
   }
   return -1;
 }
+
+/*
+ * Current valid properties:
+ * - loop assignments (2)
+ * - x <= 2147483647, line 22
+ * - i <= 2147483646, line 22
+ */
+/*
+ * Current invalid properties:
+ * - n <= (2147483648 + h), line 18
+ * - h <= (2147483647 + n), line 18
+ * - valid_rd(Malloc_0, a, 1), line 22
+ * - valid_rd(Malloc_0, shift_sint8(haystack_0, to_sint32(x)), 1), line 22
+ * - (-2147483648) <= x, line 22
+ * - j <= 2147483646, line 18
+ */
