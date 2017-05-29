@@ -23,16 +23,16 @@ brute_force (char *needle, int n, char *haystack, int h)
   /* Searching */
   /*@
    loop assigns i, j;
-   loop invariant 0 <= j <= (h-n) + 1;
+   loop invariant 0 <= i <= (h-n) + 1;
    */
-  for (j = 0; j <= h - n; ++j) {
+  for (i = 0; i <= h - n; ++i) {
     /*@
-     loop assigns i;
-     loop invariant 0 <= i <= n;
+     loop assigns j;
+     loop invariant 0 <= j <= n;
     */
-    for (i = 0; i < n && needle[i] == haystack[i + j]; ++i);
-    if (i >= n) {
-      return j;
+    for (j = 0; j < n && needle[j] == haystack[j + i]; ++j);
+    if (j >= n) {
+      return i;
     }
   }
   return -1;
@@ -42,13 +42,13 @@ brute_force (char *needle, int n, char *haystack, int h)
  * Current valid properties:
  * - loop assignments (2)
  * - x <= 2147483647
- * - i <= 2147483646
  * - j <= 2147483646
+ * - i <= 2147483646
  * - 0 <= n
  * - n <= (2147483648 + h)
- * - (-1) <= j (outer loop invariant)
+ * - (-1) <= i (outer loop invariant)
  * - n <= (1 + h) (outer loop invariant)
- * - (-1) <= i
+ * - (-1) <= j
  * - (-2147483648) <= x
  * - valid_rd(Malloc_0, a, 1)
  * - valid_rd(Malloc_0, shift_sint8(haystack_0, to_sint32(x)), 1)
