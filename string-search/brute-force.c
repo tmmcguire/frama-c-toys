@@ -14,6 +14,7 @@
  requires \valid(needle + (0 .. n-1)) && 0 <= n < INT_MAX;
  requires \valid(haystack + (0 .. h-1)) && 0 <= h < INT_MAX;
  requires n <= h;
+ assigns \nothing;
  */
 int
 brute_force (char *needle, int n, char *haystack, int h)
@@ -40,6 +41,7 @@ brute_force (char *needle, int n, char *haystack, int h)
 
 /*
  * Current valid properties:
+ * - function assignments (6)
  * - loop assignments (2)
  * - x <= 2147483647
  * - j <= 2147483646
