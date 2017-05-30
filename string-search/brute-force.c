@@ -98,3 +98,12 @@ brute_force (char *needle, int n, char *haystack, int h)
 /*
  * Current invalid properties:
  */
+
+#ifdef MAIN
+int
+main(int argc, char *argv[])
+{
+  printf("DEF in ABCDEFG: %d\n", brute_force("DEF", 3, "ABCDEFG", 7));
+  printf("DEL in ABCDEFG: %d\n", brute_force("DEL", 3, "ABCDEFG", 7));
+}
+#endif
