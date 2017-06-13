@@ -3,6 +3,8 @@
 
 /*
  * frama-c -wp -wp-rte -wp-print brute-force.c
+ *
+ * gcc -o brute-force -DMAIN -Wall brute-force.c
  */
 
 /*@
