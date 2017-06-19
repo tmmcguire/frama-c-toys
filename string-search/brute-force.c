@@ -45,6 +45,7 @@
     ensures \result == -1 ==>
       \forall int i; 0 <= i < h ==>
         !match_at(needle, n, haystack, h, i);
+  complete behaviors success, failure;
  */
 int
 brute_force (char *needle, int n, char *haystack, int h)
