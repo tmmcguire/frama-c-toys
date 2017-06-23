@@ -1,36 +1,76 @@
 #include <stdio.h>
+#include <limits.h>
 
-#define CHARS 256
-
+/*@
+ @ // needle and bad_shift are valid arrays.
+ @ requires \valid(needle + (0 .. n-1)) && 0 <= n < INT_MAX;
+ @ requires \valid(bad_shift + (0 .. chars-1)) && 0 <= chars < INT_MAX;
+ @ // needle and bad_shift are separate
+ @ requires \separated(needle + (0 .. n-1), bad_shift + (0 .. chars-1));
+ @ // the elements of needle are valid indices into bad_shift
+ @ requires \forall int i; 0 <= i < n ==> 0 <= needle[i] < chars;
+ @ // this function initializes bad_shift
+ @ assigns *(bad_shift + (0 .. chars-1));
+ @ // bad_shift is initialized to be between 1 and n+1
+ @ ensures \forall int i; 0 <= i < chars ==> 1 <= bad_shift[i] <= n+1;
+ */
 void
-make_bad_char_shift (char *needle, int n, int bad_char_shift[], int chars)
+make_bad_shift (unsigned char *needle, int n, int bad_shift[], int chars)
 {
   int i;
 
+  /*@
+   @ loop assigns i, *(bad_shift + (0 .. chars-1));
+   @ loop invariant 0 <= i <= chars;
+   @ loop invariant \forall int k; 0 <= k < i ==> bad_shift[k] == n + 1;
+   */
   for (i = 0; i < chars; ++i) {
-    bad_char_shift[i] = n + 1;
+    bad_shift[i] = n + 1;
   }
+  /*@
+   @ loop assigns i, *(bad_shift + (0 .. chars-1));
+   @ loop invariant 0 <= i <= n;
+   @ loop invariant \forall int k; 0 <= k < chars ==> 1 <= bad_shift[k] <= n+1;
+   */
   for (i = 0; i < n; ++i) {
-    bad_char_shift[needle[i]] = n - i;
+    bad_shift[needle[i]] = n - i;
   }
 }
 
+/*@
+ @ // Original requirements for searching
+ @ requires \valid(needle + (0 .. n-1)) && 0 <= n < INT_MAX;
+ @ requires \valid(haystack + (0 .. h-1)) && 0 <= h < INT_MAX;
+ @ requires n <= h;
+ @ // the elements of needle are valid indices into bad_shift
+ @ requires \forall int i; 0 <= i < n ==> 0 <= needle[i] < UCHAR_MAX + 1;
+ @ assigns \nothing;
+ */
 int
-QS (char *needle, int n, char *haystack, int h)
+QS (unsigned char *needle, int n, unsigned char *haystack, int h)
 {
-  int i, j, bad_char_shift[CHARS];
+  int i, j, bad_shift[UCHAR_MAX + 1];
 
   /* Preprocessing */
-  make_bad_char_shift (needle, n, bad_char_shift, CHARS);
+  make_bad_shift(needle, n, bad_shift, UCHAR_MAX + 1);
 
   /* Searching */
   i = 0;
+  /*@
+   @ loop assigns i, j;
+   @ loop invariant 0 <= i <= h + 1;
+   */
   while (i <= h - n) {
+    /*@
+     @ loop assigns j;
+     @ loop invariant 0 <= j <= n;
+     */
     for (j = 0; j < n && needle[j] == haystack[i + j]; ++j);
     if (j >= n) {
       return i;
     }
-    i += bad_char_shift[haystack[i + n]];	/* shift */
+    // if (i == h - n) { break; } // NEW
+    i += bad_shift[ haystack[i + n] ];	/* shift */
   }
   return -1;
 }
@@ -46,4 +86,3 @@ main(int argc, char *argv[])
   printf("ABCB in XXXABCBXX: %d\n", QS("ABCB", 4, "XXXABCBXX", 9));
 }
 #endif
-
