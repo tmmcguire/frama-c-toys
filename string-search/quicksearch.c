@@ -69,7 +69,7 @@ QS (unsigned char *needle, int n, unsigned char *haystack, int h)
     if (j >= n) {
       return i;
     }
-    // if (i == h - n) { break; } // NEW
+    if (i == h - n) { break; }
     i += bad_shift[ haystack[i + n] ];	/* shift */
   }
   return -1;
