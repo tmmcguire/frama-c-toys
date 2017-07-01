@@ -102,12 +102,12 @@ QS (unsigned char *needle, int n, unsigned char *haystack, int h)
     }
     if (i == h - n) { break; }
 
-     /*@ ghost
-      @  //@ loop assigns g; loop invariant i + 1 ≤ g ≤ i + bad_shift[ haystack[i + n] ]; loop invariant ∀ int k; i + 1 ≤ k < g ⇒  !match_at(k, haystack, h, needle, n);
-      @  for (g = i + 1; g < i + bad_shift[ haystack[i + n] ]; ++g) {
-      @    //@ assert haystack[i + n] != needle[i + n - g];
-      @  }
-      */
+    /*@ ghost
+     @  //@ loop assigns g; loop invariant i + 1 ≤ g ≤ i + bad_shift[ haystack[i + n] ]; loop invariant ∀ int k; i + 1 ≤ k < g ⇒  !match_at(k, haystack, h, needle, n);
+     @  for (g = i + 1; g < i + bad_shift[ haystack[i + n] ]; ++g) {
+     @    //@ assert haystack[i + n] != needle[i + n - g];
+     @  }
+     */
 
     i += bad_shift[ haystack[i + n] ];	/* shift */
   }
