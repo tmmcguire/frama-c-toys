@@ -27,7 +27,7 @@
  @ ensures ∀ int c; 0 ≤ c < chars ⇒
  @   (∀ int k; n - bad_shift[c] + 1 ≤ k < n ⇒  needle[k] != c);
  */
-void
+static void
 make_bad_shift (unsigned char *needle, int n, int bad_shift[], int chars)
 {
   int i;
@@ -60,11 +60,14 @@ make_bad_shift (unsigned char *needle, int n, int bad_shift[], int chars)
  @ requires n ≤ h;
  @ // the elements of needle are valid indices into bad_shift
  @ requires ∀ int i; 0 ≤ i < n ⇒  0 ≤ needle[i] < UCHAR_MAX + 1;
+ @ // QS makes no globally visible changes
  @ assigns \nothing;
+ @ // safety: limits on return values
  @ ensures -1 ≤ \result ≤ (h-n);
  @
  @ behavior success:
  @   ensures \result >= 0 ⇒  match_at(\result, haystack, h, needle, n);
+ @
  @ behavior failure:
  @   ensures \result == -1 ⇒
  @     ∀ int i; 0 ≤ i < h ⇒
@@ -74,6 +77,7 @@ int
 QS (unsigned char *needle, int n, unsigned char *haystack, int h)
 {
   int i, j, bad_shift[UCHAR_MAX + 1];
+  //@ ghost int g;
 
   /* Preprocessing */
   make_bad_shift(needle, n, bad_shift, UCHAR_MAX + 1);
@@ -81,7 +85,7 @@ QS (unsigned char *needle, int n, unsigned char *haystack, int h)
   /* Searching */
   i = 0;
   /*@
-   @ loop assigns i, j;
+   @ loop assigns g, i, j;
    @ loop invariant 0 ≤ i ≤ h + 1;
    @ loop invariant ∀ int k; 0 ≤ k < i ⇒
    @   !match_at(k, haystack, h, needle, n);
@@ -98,15 +102,12 @@ QS (unsigned char *needle, int n, unsigned char *haystack, int h)
     }
     if (i == h - n) { break; }
 
-    /*@
-     @ loop assigns j;
-     @ loop invariant i + 1 ≤ j ≤ i + bad_shift[ haystack[i + n] ];
-     @ loop invariant ∀ int k; i + 1 ≤ k < j ⇒
-     @   !match_at(k, haystack, h, needle, n);
-     */
-    for (j = i + 1; j < i + bad_shift[ haystack[i + n] ]; ++j) {
-      //@ assert haystack[i + n] != needle[i + n - j];
-    }
+     /*@ ghost
+      @  //@ loop assigns g; loop invariant i + 1 ≤ g ≤ i + bad_shift[ haystack[i + n] ]; loop invariant ∀ int k; i + 1 ≤ k < g ⇒  !match_at(k, haystack, h, needle, n);
+      @  for (g = i + 1; g < i + bad_shift[ haystack[i + n] ]; ++g) {
+      @    //@ assert haystack[i + n] != needle[i + n - g];
+      @  }
+      */
 
     i += bad_shift[ haystack[i + n] ];	/* shift */
   }
