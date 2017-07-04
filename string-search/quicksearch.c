@@ -62,74 +62,105 @@ make_bad_shift (unsigned char *needle, int n, int bad_shift[], int chars)
 }
 
 /*@
- @ // Original requirements for searching: valid strings;
- @ // also, the elements of needle are valid indices into bad_shift
+ @ // haystack and bad_shift are valid arrays
  @ requires
- @      \valid(needle + (0 .. n-1))
- @   ∧  \valid(haystack + (0 .. h-1))
- @   ∧  0 ≤ n < INT_MAX
- @   ∧  0 ≤ h < INT_MAX
- @   ∧  n ≤ h
- @   ∧  ∀ int k; 0 ≤ k < n ⇒  0 ≤ needle[k] < UCHAR_MAX + 1;
+ @   \valid(haystack + (0 .. h - 1)) ∧  \valid(bad_shift + (0 .. UCHAR_MAX));
+ @ // n and h are appropriately sized
+ @ requires
+ @   0 ≤ n ≤ h < INT_MAX;
+ @ // i is suitably inside haystack
+ @ requires
+ @   0 ≤ i < h - n;
+ @ // bad_shift has valid and meaningful shifts
+ @ requires
+ @   ∀ int c; 0 ≤ c < UCHAR_MAX + 1 ⇒
+ @       (1 ≤ bad_shift[c] ≤ n + 1
+ @     ∧  ∀ int k; n - bad_shift[c] + 1 ≤ k < n ⇒  needle[k] != c);
  @
- @ // QS makes no globally visible changes
  @ assigns
  @   \nothing;
  @
- @ // safety: limits on return values
  @ ensures
- @   -1 ≤ \result ≤ (h-n);
- @
- @ // success: a match was found and the location returned
- @ behavior success:
- @   ensures
- @     \result >= 0 ⇒  match_at(\result, haystack, h, needle, n);
- @
- @ // failure: there is no match in the haystack
- @ behavior failure:
- @   ensures
- @     \result == -1 ⇒
- @       ∀ int k; 0 ≤ k < h ⇒
- @         !match_at(k, haystack, h, needle, n);
+ @   ∀ int k; i + 1 ≤ k < i + bad_shift[ haystack[i + n] ] ⇒
+ @     !match_at(k, haystack, h, needle, n);
  */
+static void
+lemma_no_match_in_shift(unsigned char *needle, int n,
+                        unsigned char *haystack, int h,
+                        int *bad_shift, int i)
+{
+  int g;
+  /*@
+   @ loop assigns g;
+   @ loop invariant i + 1 ≤ g ≤ i + bad_shift[ haystack[i + n] ];
+   @ loop invariant ∀ int k; i + 1 ≤ k < g ⇒  !match_at(k, haystack, h, needle, n);
+   */
+  for (g = i + 1; g < i + bad_shift[ haystack[i + n] ]; ++g) {
+    //@ assert haystack[i + n] != needle[i + n - g];
+  }
+}
+
+/*@
+  @ // Original requirements for searching: valid strings and lengths;
+  @ // also, the elements of needle are valid indices into bad_shift
+  @ requires
+  @      \valid(needle + (0 .. n-1))
+  @   ∧  \valid(haystack + (0 .. h-1))
+  @   ∧  0 ≤ n ≤ h < INT_MAX
+  @   ∧  ∀ int k; 0 ≤ k < n ⇒  0 ≤ needle[k] < UCHAR_MAX + 1;
+  @
+  @ // QS makes no globally visible changes
+  @ assigns
+  @   \nothing;
+  @
+  @ // safety: limits on return values
+  @ ensures
+  @   -1 ≤ \result ≤ (h - n);
+  @
+  @ // success: a match was found and the location returned
+  @ behavior success:
+  @   ensures
+  @     \result >= 0 ⇒  match_at(\result, haystack, h, needle, n);
+  @
+  @ // failure: there is no match in the haystack
+  @ behavior failure:
+  @   ensures
+  @     \result == -1 ⇒
+  @       ∀ int k; 0 ≤ k < h ⇒
+  @         !match_at(k, haystack, h, needle, n);
+  */
 int
 QS (unsigned char *needle, int n, unsigned char *haystack, int h)
 {
   int i, j, bad_shift[UCHAR_MAX + 1];
-  //@ ghost int g;
 
   /* Preprocessing */
   make_bad_shift(needle, n, bad_shift, UCHAR_MAX + 1);
   /* Searching */
   i = 0;
   /*@
-   @ loop assigns
-   @   g, i, j;
-   @ loop invariant
-   @      0 ≤ i ≤ h + 1
-   @   ∧  ∀ int k; 0 ≤ k < i ⇒
-   @        !match_at(k, haystack, h, needle, n);
-   */
+    @ loop assigns
+    @   i, j;
+    @ loop invariant
+    @      0 ≤ i ≤ h + 1
+    @   ∧  ∀ int k; 0 ≤ k < i ⇒
+    @        !match_at(k, haystack, h, needle, n);
+    */
   while (i <= h - n) {
     /*@
-     @ loop assigns
-     @   j;
-     @ loop invariant
-     @      0 ≤ j ≤ n
-     @   ∧  match_at(i, haystack, h, needle, j);
-     */
+      @ loop assigns
+      @   j;
+      @ loop invariant
+      @      0 ≤ j ≤ n
+      @   ∧  match_at(i, haystack, h, needle, j);
+      */
     for (j = 0; j < n && needle[j] == haystack[i + j]; ++j);
     if (j >= n) {
       return i;
     }
     if (i == h - n) { break; }
 
-    /*@ ghost
-     @  //@ loop assigns g; loop invariant i + 1 ≤ g ≤ i + bad_shift[ haystack[i + n] ]; loop invariant ∀ int k; i + 1 ≤ k < g ⇒  !match_at(k, haystack, h, needle, n);
-     @  for (g = i + 1; g < i + bad_shift[ haystack[i + n] ]; ++g) {
-     @    //@ assert haystack[i + n] != needle[i + n - g];
-     @  }
-     */
+    //@ ghost lemma_no_match_in_shift(needle, n, haystack, h, bad_shift, i);
 
     i += bad_shift[ haystack[i + n] ];	/* shift */
   }
