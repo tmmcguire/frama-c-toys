@@ -117,10 +117,13 @@ lemma_no_match_in_shift(unsigned char *needle, int n,
   @ ensures
   @   -1 ≤ \result ≤ (h - n);
   @
-  @ // success: a match was found and the location returned
+  @ // success: the leftmost match was found and the location returned
   @ behavior success:
   @   ensures
-  @     \result >= 0 ⇒  match_at(\result, haystack, h, needle, n);
+  @     \result >= 0 ⇒
+  @       (match_at(\result, haystack, h, needle, n)
+  @       ∧  ∀ int k; 0 ≤ k < \result ⇒
+  @            !match_at(k, haystack, h, needle, n));
   @
   @ // failure: there is no match in the haystack
   @ behavior failure:
