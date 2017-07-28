@@ -1,69 +1,6 @@
 with Ada.Text_IO;
 
 package body QSort with SPARK_Mode is
---               and L < U and U < Natural'Last
---                 and Is_Permutation(Values, Original, Witness)),
---       (Values : in Nat_Array;
---        L : Natural;
---        P : Natural;
---        U : Natural) return Boolean
---     is
---       ((for all K in L .. P => Values(K) <= Values(P))
---        and (for all K in P + 1 .. U => Values(P) < Values(K)))
---     with
---     Ghost,
---     Pre => (L in Values'Range and U in Values'Range
---             and L <= P and P <= U and U < Natural'Last);
---         Post => (P in L .. Un Is_Partitioned
---       (Values : in Nat_Array;
---       (Values : in out Nat_Array;
---        I : in Natural;
---        J : in Natural;
---        Original : in Nat_Array;
---        Witness : in out Nat_Array)
---       with
---         Pre => (I in Values'Range
---                 and J in Values'Range
---                 and Is_Permutation(Values, Original, Witness)),
---         Post => (Values(I) = Values'Old(J)
---                  and Values(J) = Values'Old(I)
---                  and (for all K in Values'Range =>
---                             (K = I or K = J or Values(K) = Values'Old(K)))
---                  and Is_Permutation(Values, Original, Witness))
---     is
---        Temp : Natural;
---     begin
---        Temp := Values(I);
---        Values(I) := Values(J);
---        Values(J) := Temp;
---        Temp := Witness(I);
---        Witness(I) := Witness(J);
---        Witness(J) := Temp;
---     end Swap;
---        L : Natural;
---        P : Natural;
---       (Values : in Nat_Array;
---        L : in Natural;
---        U : in Natural;
---        M : out Natural)
---       with
---               and L < U and U < Natural'Last
---                 and Is_Permutation(Values, Original, Witness)),
---         Post => (P in L .. Un Is_Partitioned
---       (Values : in Nat_Array;
---        L : Natural;
---        P : Natural;
---        U : Natural) return Boolean
---     is
---       ((for all K in L .. P => Values(K) <= Values(P))
---        and (for all K in P + 1 .. U => Values(P) < Values(K)))
---     with
---     Ghost,
---     Pre => (L in Values'Range and U in Values'Range
---             and L <= P and P <= U and U < Natural'Last);
---  tioned(Values, L, P, U))
-
-   --     function Is_Partitioned
 
    function Is_Partitioned
      (Ary : in Nat_Array;
